@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  ellatech_postgres:
+    image: postgres:alpine
+    container_name:  ellatech_postgres  
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - '5433:5432'
+    volumes:
+      -  ellatech_postgres_data:/var/lib/postgresql/data 
+
+  ellatech_redis: 
+    image: redis:alpine
+    container_name: ellatech_redis 
+    ports:
+      - '6379:6379'
+    volumes:
+      -  ellatech_redis_data:/data 
+
+networks:
+  default:
+    name: nestjs_starter
+
+volumes:
+  ellatech_postgres_data:
+  ellatech_redis_data:
