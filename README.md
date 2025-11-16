@@ -19,22 +19,10 @@ cd ellatech
 pnpm install
 ```
 
-2. **Create `.env` file: or Refer .env.example file**
+2. **Create `.env` file:**
+  copy .env.example file
 
-```env
-POSTGRES_NAME=ellatech
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-DATABASE_HOST=localhost
-DATABASE_PORT=5433
-DATABASE_USERNAME=postgres
-DATABASE_PASSWORD=postgres
-DATABASE_NAME=ellatech
-NODE_ENV=development
-PORT=3000
-```
-
-3. **Start services:**
+4. **Start services:**
 
 ```bash
 # Start PostgreSQL and Redis
