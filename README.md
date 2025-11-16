@@ -1,98 +1,176 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Ellatech - NestJS User and Product Management API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A simple NestJS REST API for managing users, products, and tracking inventory transactions with PostgreSQL and TypeORM.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Quick Start
 
-## Description
+### Prerequisites
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Node.js 20+ and pnpm
+- Docker and Docker Compose
 
-## Project setup
+### Installation
+
+1. **Clone and install dependencies:**
 
 ```bash
-$ pnpm install
+git clone https://github.com/melkam59/ellatech.git
+cd ellatech
+pnpm install
 ```
 
-## Compile and run the project
+2. **Create `.env` file: or Refer .env.example file**
+
+```env
+POSTGRES_NAME=ellatech
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+DATABASE_HOST=localhost
+DATABASE_PORT=5433
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=ellatech
+NODE_ENV=development
+PORT=3000
+```
+
+3. **Start services:**
 
 ```bash
-# development
-$ pnpm run start
+# Start PostgreSQL and Redis
+docker-compose up -d ellatech_postgres ellatech_redis
 
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+# Start the API
+pnpm run start:dev
 ```
 
-## Run tests
+The API will be available at `http://localhost:3000`
+
+## API Endpoints
+
+### Users
+
+**POST** `/users` - Create a user
+
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com"
+}
+```
+
+### Products
+
+**POST** `/products` - Create a product
+
+```json
+{
+  "name": "Laptop",
+  "description": "Gaming laptop",
+  "price": 1299.99,
+  "quantity": 100
+}
+```
+
+**PUT** `/products/update` - Update product quantity
+
+```json
+{
+  "productId": "uuid",
+  "quantity": -10,
+  "type": "SALE",
+  "userId": "uuid"
+}
+```
+
+**GET** `/products/status/:productId` - Get product status
+
+### Transactions
+
+**GET** `/transactions` - Get all transactions
+
+## Example Usage
 
 ```bash
-# unit tests
-$ pnpm run test
+# 1. Create a user
+curl -X POST http://localhost:3000/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John Doe","email":"john@example.com"}'
 
-# e2e tests
-$ pnpm run test:e2e
+# 2. Create a product
+curl -X POST http://localhost:3000/products \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Laptop","description":"Gaming laptop","price":1299.99,"quantity":100}'
 
-# test coverage
-$ pnpm run test:cov
+# 3. Update product quantity
+curl -X PUT http://localhost:3000/products/update \
+  -H "Content-Type: application/json" \
+  -d '{"productId":"<product-id>","quantity":-10,"type":"SALE","userId":"<user-id>"}'
+
+# 4. Get product status
+curl http://localhost:3000/products/status/<product-id>
+
+# 5. Get all transactions
+curl http://localhost:3000/transactions
 ```
 
-## Deployment
+## Technical Implementation
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+This API uses several NestJS features to ensure reliability and consistency:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- **Response Interceptor**: All API responses are wrapped in a `{data: ...}` format for consistency
+- **Validation Pipe**: Automatically validates all incoming requests using class-validator decorators
+- **Database Transactions**: Product updates use database transactions to ensure data consistency (if product update fails, transaction record isn't created)
+- **TypeORM Migrations**: Database schema is managed through migrations that run automatically on startup
+- **Redis Cache**: Caching infrastructure is set up (ready for future use) to speed up frequent queries
+- **Security Headers**: Helmet middleware adds security headers to all responses
+- **Error Handling**: Proper HTTP status codes (400, 404, 409, 500) with clear error messages
+- **CI/CD Pipeline**: GitHub Actions workflows automatically run tests, linting, and build checks on every push and pull request
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+## Project Structure
+
+```
+src/
+├── entities/          # Database models (User, Product, Transaction)
+├── users/             # Users module (controller, service, DTOs)
+├── products/          # Products module
+├── transactions/      # Transactions module
+└── core/              # Shared modules (database, cache, interceptors)
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Features
 
-## Resources
+- ✅ User management with email validation
+- ✅ Product management with inventory tracking
+- ✅ Automatic transaction history on quantity changes
+- ✅ Input validation on all endpoints
+- ✅ Error handling with proper HTTP status codes
+- ✅ Docker Compose setup for easy local development
+- ✅ Database migrations for schema management
+- ✅ CI/CD pipeline with automated testing and deployment workflows
 
-Check out a few resources that may come in handy when working with NestJS:
+## Assumptions & Trade-offs
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Assumptions
 
-## Support
+- **No Authentication**: Users don't require passwords. The API focuses on inventory management without auth.
+- **Simple Transaction Model**: Transactions track quantity changes only. No additional metadata like notes or approval workflows.
+- **Auto-run Migrations**: Database schema is managed through migrations that run automatically on startup.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Trade-offs
 
-## Stay in touch
+- **No Pagination**: `/transactions` returns all records. For large datasets, pagination would be needed.
+- **No Soft Deletes**: Entities are permanently deleted. Soft deletes would preserve history.
+- **Simple Error Messages**: Errors return basic messages. More detailed error codes could improve client handling.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Future Improvements
 
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Add pagination for transactions endpoint
+- Implement authentication and authorization
+- Add filtering and sorting for transactions
+- Implement soft deletes for data preservation
+- Add product categories and tags
+- Implement caching for frequently accessed products
+- Add comprehensive API documentation (Swagger/OpenAPI)
+- Add unit and integration tests
+- Implement rate limiting
