@@ -28,7 +28,7 @@ pnpm install
 
 ```bash
 # Start PostgreSQL and Redis
-docker-compose up -d ellatech_postgres ellatech_redis
+docker compose up -d ellatech_postgres ellatech_redis
 
 # Start the API
 pnpm run start:dev
