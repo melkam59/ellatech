@@ -20,6 +20,8 @@ pnpm install
 ```
 
 2. **Create `.env` file:**
+
+
   copy .env.example file
 
 4. **Start services:**
