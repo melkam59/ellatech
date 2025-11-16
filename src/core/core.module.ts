@@ -6,6 +6,7 @@ import { TransformResponseinterceptor } from './interceptors/transform-response/
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 import { CacheService } from './cache/cache.service';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CacheService } from './cache/cache.service';
       },
       inject: [ConfigService],
     }),
+    DatabaseModule,
   ],
   providers: [
     CacheService,
